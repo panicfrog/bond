@@ -1,8 +1,0 @@
-framework module "Bond" {
-	header "ref.h"
-    header "Client.objc.h"
-    header "Universe.objc.h"
-    header "Bond.h"
-
-    export *
-}
