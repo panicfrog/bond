@@ -27,7 +27,7 @@ type FileInfo struct {
 	Flag     string `json:"flag"`
 }
 
-type fileUploadResponse struct {
+type FileUploadResponse struct {
 	Code    string   `json:"code"`
 	Message string   `json:"message"`
 	Data    FileInfo `json:"data"`
@@ -56,7 +56,7 @@ func (u *uploadFilePipe) ReqResFlow(input []byte) ([]byte, error) {
 	if u.handler != nil {
 		u.handler.HandleUploadFile(request, nil)
 	}
-	response := fileUploadResponse{
+	response := FileUploadResponse{
 		Code:    "S0001",
 		Message: "success",
 		Data: FileInfo{
