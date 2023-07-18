@@ -16,7 +16,6 @@
 @class ClientEntity;
 @class ClientFileInfo;
 @class ClientFileUploadRequest;
-@class ClientFileUploadResponse;
 @class ClientStreamSink;
 @protocol ClientFireForgetPipe;
 @class ClientFireForgetPipe;
@@ -28,6 +27,8 @@
 @class ClientRequestStreamPipe;
 @protocol ClientStreamResponse;
 @class ClientStreamResponse;
+@protocol ClientUploadFileHandler;
+@class ClientUploadFileHandler;
 
 @protocol ClientFireForgetPipe <NSObject>
 - (void)fireForgetFlow:(NSData* _Nullable)input;
@@ -49,6 +50,10 @@
 @protocol ClientStreamResponse <NSObject>
 - (void)error:(NSError* _Nullable)p0;
 - (void)response:(NSData* _Nullable)p0;
+@end
+
+@protocol ClientUploadFileHandler <NSObject>
+- (void)handleUploadFile:(ClientFileUploadRequest* _Nullable)request error:(NSError* _Nullable)error;
 @end
 
 @interface ClientConsoleRequest : NSObject <goSeqRefInterface> {
@@ -85,7 +90,7 @@
 - (BOOL)registerFireForgetPipe:(NSString* _Nullable)name requestSchema:(NSString* _Nullable)requestSchema action:(id<ClientFireForgetPipe> _Nullable)action error:(NSError* _Nullable* _Nullable)error;
 - (BOOL)registerReqResPipe:(NSString* _Nullable)name requestSchema:(NSString* _Nullable)requestSchema responseSchema:(NSString* _Nullable)responseSchema action:(id<ClientReqResPipe> _Nullable)action error:(NSError* _Nullable* _Nullable)error;
 - (ClientStreamSink* _Nullable)registerReqStreamPipe:(NSString* _Nullable)name requestSchema:(NSString* _Nullable)requestSchema responseSchema:(NSString* _Nullable)responseSchema action:(id<ClientRequestStreamPipe> _Nullable)action error:(NSError* _Nullable* _Nullable)error;
-- (BOOL)registerUploadFile:(NSError* _Nullable* _Nullable)error;
+- (BOOL)registerUploadFile:(id<ClientUploadFileHandler> _Nullable)handler error:(NSError* _Nullable* _Nullable)error;
 - (NSData* _Nullable)requestResponse:(NSString* _Nullable)name to:(NSString* _Nullable)to parameters:(NSData* _Nullable)parameters error:(NSError* _Nullable* _Nullable)error;
 - (BOOL)requestStream:(NSString* _Nullable)name to:(NSString* _Nullable)to parameters:(NSData* _Nullable)parameters responseF:(id<ClientStreamResponse> _Nullable)responseF error:(NSError* _Nullable* _Nullable)error;
 - (BOOL)soundOutService:(NSString* _Nullable)sever service:(NSString* _Nullable)service error:(NSError* _Nullable* _Nullable)error;
@@ -108,23 +113,11 @@
 
 - (nonnull instancetype)initWithRef:(_Nonnull id)ref;
 - (nonnull instancetype)init;
-// skipped field FileUploadRequest.FileInfo with unsupported type: client.FileInfo
-
-// skipped field FileUploadRequest.FileData with unsupported type: *[]byte
-
+@property (nonatomic) NSString* _Nonnull fileName;
+@property (nonatomic) long fileSize;
+@property (nonatomic) NSString* _Nonnull flag;
+@property (nonatomic) NSData* _Nullable fileData;
 - (NSData* _Nullable)encode:(NSError* _Nullable* _Nullable)error;
-@end
-
-@interface ClientFileUploadResponse : NSObject <goSeqRefInterface> {
-}
-@property(strong, readonly) _Nonnull id _ref;
-
-- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
-- (nonnull instancetype)init;
-@property (nonatomic) NSString* _Nonnull code;
-@property (nonatomic) NSString* _Nonnull message;
-// skipped field FileUploadResponse.Data with unsupported type: client.FileInfo
-
 @end
 
 @interface ClientStreamSink : NSObject <goSeqRefInterface> {
@@ -149,6 +142,8 @@ FOUNDATION_EXPORT ClientEntity* _Nullable ClientSetup(NSString* _Nullable identi
 @class ClientRequestStreamPipe;
 
 @class ClientStreamResponse;
+
+@class ClientUploadFileHandler;
 
 @interface ClientFireForgetPipe : NSObject <goSeqRefInterface, ClientFireForgetPipe> {
 }
@@ -190,6 +185,14 @@ FOUNDATION_EXPORT ClientEntity* _Nullable ClientSetup(NSString* _Nullable identi
 - (nonnull instancetype)initWithRef:(_Nonnull id)ref;
 - (void)error:(NSError* _Nullable)p0;
 - (void)response:(NSData* _Nullable)p0;
+@end
+
+@interface ClientUploadFileHandler : NSObject <goSeqRefInterface, ClientUploadFileHandler> {
+}
+@property(strong, readonly) _Nonnull id _ref;
+
+- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+- (void)handleUploadFile:(ClientFileUploadRequest* _Nullable)request error:(NSError* _Nullable)error;
 @end
 
 #endif

@@ -78,8 +78,8 @@ func getUserService(kv clientv3.KV, user string) ([]string, error) {
 
 func main() {
 	cli, err := clientv3.New(clientv3.Config{
-		//Endpoints:   []string{"etcd1:2379"},
-		Endpoints:   []string{"172.16.232.77:2379"},
+		Endpoints: []string{"etcd1:2379"},
+		//Endpoints:   []string{"172.16.232.77:2379"},
 		DialTimeout: 5 * time.Second,
 	})
 

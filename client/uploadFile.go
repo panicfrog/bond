@@ -7,11 +7,18 @@ import (
 	"encoding/json"
 )
 
-type uploadFilePipe struct{}
+type uploadFilePipe struct {
+	handler UploadFileHandler
+}
+type UploadFileHandler interface {
+	HandleUploadFile(request *FileUploadRequest, error error)
+}
 
 type FileUploadRequest struct {
-	FileInfo
-	FileData *[]byte
+	FileName string `json:"fileName"`
+	FileSize int    `json:"fileSize"`
+	Flag     string `json:"flag"`
+	FileData []byte
 }
 
 type FileInfo struct {
@@ -20,7 +27,7 @@ type FileInfo struct {
 	Flag     string `json:"flag"`
 }
 
-type FileUploadResponse struct {
+type fileUploadResponse struct {
 	Code    string   `json:"code"`
 	Message string   `json:"message"`
 	Data    FileInfo `json:"data"`
@@ -36,14 +43,20 @@ func (r *FileUploadRequest) Encode() ([]byte, error) {
 	return result.Bytes(), nil
 }
 
-func (u uploadFilePipe) ReqResFlow(input []byte) ([]byte, error) {
+func (u *uploadFilePipe) ReqResFlow(input []byte) ([]byte, error) {
 	dec := gob.NewDecoder(bytes.NewReader(input))
 	var request = new(FileUploadRequest)
 	err := dec.Decode(&request)
 	if err != nil {
+		if u.handler != nil {
+			u.handler.HandleUploadFile(nil, err)
+		}
 		return nil, err
 	}
-	response := FileUploadResponse{
+	if u.handler != nil {
+		u.handler.HandleUploadFile(request, nil)
+	}
+	response := fileUploadResponse{
 		Code:    "S0001",
 		Message: "success",
 		Data: FileInfo{
@@ -54,6 +67,6 @@ func (u uploadFilePipe) ReqResFlow(input []byte) ([]byte, error) {
 	return json.Marshal(response)
 }
 
-func (e *Entity) RegisterUploadFile() error {
-	return e.RegisterReqResPipe(common.UploadFilePipeName, "", "", &uploadFilePipe{})
+func (e *Entity) RegisterUploadFile(handler UploadFileHandler) error {
+	return e.RegisterReqResPipe(common.UploadFilePipeName, "", "", &uploadFilePipe{handler: handler})
 }
