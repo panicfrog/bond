@@ -50,11 +50,10 @@ var uploadFileCmd = &cobra.Command{
 			return
 		}
 		request := client.FileUploadRequest{
-			FileInfo: client.FileInfo{
-				FileName: filepath.Base(file),
-				FileSize: len(data),
-			},
-			FileData: &data,
+			FileName: filepath.Base(file),
+			FileSize: len(data),
+			FileData: data,
+			Flag:     "",
 		}
 		d, err := request.Encode()
 		if err != nil {
@@ -83,5 +82,6 @@ func init() {
 	uploadFileCmd.Flags().StringP("device", "d", "", "device id")
 	uploadFileCmd.Flags().StringP("address", "a", "192.168.233.52", "address of server")
 	uploadFileCmd.Flags().IntP("port", "p", 8080, "port of server")
+	uploadFileCmd.Flags().StringP("file", "f", "", "file path")
 	rootCmd.AddCommand(uploadFileCmd)
 }
